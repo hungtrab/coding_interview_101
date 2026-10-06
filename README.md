@@ -5,7 +5,7 @@
 ## Nội dung chính
 
 - Roadmap LeetCode theo 4 phase: nền tảng, core patterns, graph/DP, bit manipulation và advanced topics.
-- Tab **Leetcode Levelling** gồm 62 bài (58 LeetCode + 4 CSES), chia theo 12 topic, đi từ L0 → L1 → L2, kèm mục tiêu học của từng bài và ★ core 20.
+- Tab **Leetcode Levelling** gồm 145 bài khác nhau (141 LeetCode + 4 CSES), chia thành 146 lượt luyện theo 12 topic. Mỗi topic có 3–5 bài ở từng level L0, L1, L2, kèm mục tiêu học và ★ core 20.
 - Danh sách HackerRank theo nhóm kỹ năng: warm-up, array/sorting, string, hashmap/search, stack/queue, tree/graph, dynamic programming, greedy.
 - Bộ lọc bài: tất cả, chưa làm, đã làm, và nhóm must-do cho LeetCode/Levelling. Tab Levelling có thêm bộ lọc level, mở tất cả hoặc thu gọn topic.
 - Thanh tiến độ tổng và thống kê theo độ khó Easy, Medium, Hard.
@@ -15,13 +15,19 @@
 
 ## Leetcode Levelling
 
-- **L0**: biết pattern, học và code template.
-- **L1**: tự nhận ra một pattern chính trong khoảng 5 phút.
-- **L2**: nhận pattern rồi biến đổi hoặc ghép thêm pattern khác.
+- **L0**: 3–5 bài thuần template.
+- **L1**: 3–5 bài biến thể, tự nhận pattern.
+- **L2**: 3–5 bài combination / interview-ish.
 
-Level luyện pattern độc lập với độ khó Easy/Medium/Hard. Các nhãn chuyển tiếp L0/L1, L1/L2 và L1+/L2 được giữ nguyên; bộ lọc level bao gồm cả các bài chuyển tiếp tương ứng. CSES được thống kê riêng, không gán độ khó LeetCode.
+Level luyện pattern độc lập với độ khó Easy/Medium/Hard. Mỗi topic tách rõ nhóm L0/L1/L2 và có tiến độ theo level; bộ lọc level dùng đúng phân loại của roadmap mới. CSES được thống kê riêng, không gán độ khó LeetCode.
 
-12 topic: Hash map + Prefix Sum, Sorting + Two Pointers, Sliding Window, Binary Search, Stack + Monotonic Stack, Heap / Priority Queue, Intervals + Greedy, Tree, Graph BFS/DFS, Dynamic Programming, Backtracking và Linked List. Các nhóm nhỏ của Binary Search, Stack và DP cũng được tách rõ trong topic.
+Thứ tự học: Hash Map / Prefix Sum → Two Pointers → Sliding Window → Binary Search → Stack / Monotonic Stack → Heap / Priority Queue → Dynamic Programming → Tree DFS/BFS → Graph → Intervals / Greedy → Backtracking → Linked List.
+
+Học sâu từng topic theo L0 → L1 → L2. Nếu tự nhận đúng pattern và code được 3 bài liên tiếp, chuyển lên level tiếp; nếu liên tục gặp khó thì quay lại thêm 1–2 bài level trước. Ưu tiên luyện đủ progression của **Two Pointers, Heap và DP**.
+
+LC 42 — Trapping Rain Water xuất hiện ở cả Two Pointers và Stack, với mục tiêu luyện riêng cho từng pattern. Cả hai dùng chung trạng thái hoàn thành; thanh tiến độ tổng và thống kê độ khó chỉ tính bài này một lần. Vì vậy có **146 lượt luyện nhưng 145 bài khác nhau**. Thay đổi topic hoặc level không làm mất tiến độ đã lưu theo số bài.
+
+Tên, link và độ khó LeetCode được đối chiếu với danh mục chính thức; dữ liệu được lưu sẵn trong ứng dụng nên không cần gọi API khi sử dụng.
 
 ★ Must-do trong tab Levelling lọc đúng **core 20**. Sau khi học, thử tự derive lại các bài core sau 2 tuần rồi chuyển sang random problem và mock interview.
 

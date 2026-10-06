@@ -455,6 +455,7 @@ const toggleHr = (key) => setHrDone((prev) => {
   const hrDoneCount = allHr.filter((p) => hrDone.has(p.key)).length;
   const levellingTotal = LEVELLING_PROBLEMS.length;
   const levellingDone = LEVELLING_PROBLEMS.filter((p) => p.lc ? done.has(p.lc) : csesDone.has(p.cses)).length;
+  const csesTotal = LEVELLING_PROBLEMS.filter((p) => p.cses).length;
   const csesDoneCount = LEVELLING_PROBLEMS.filter((p) => p.cses && csesDone.has(p.cses)).length;
   const starProblems = allLc.filter((p) => p.star);
 
@@ -540,7 +541,7 @@ const toggleHr = (key) => setHrDone((prev) => {
                 {DIFF_LABELS[d]}: <b>{currentStats[d + "d"]}/{currentStats[d]}</b>
               </span>
             ))}
-            {tab === "levelling" && <span style={{ color: "#d2a8ff" }}>CSES: <b>{csesDoneCount}/4</b></span>}
+            {tab === "levelling" && <span style={{ color: "#d2a8ff" }}>CSES: <b>{csesDoneCount}/{csesTotal}</b></span>}
           </div>
           <div style={{ display: "flex", gap: 4 }}>
             {(tab !== "hackerrank"

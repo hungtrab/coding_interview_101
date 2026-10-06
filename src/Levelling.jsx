@@ -3,6 +3,7 @@ import { LEVELLING_PROBLEMS, LEVELLING_TOPICS, levellingKey, levellingUrl } from
 import "./Levelling.css";
 
 const DIFFICULTIES = { E: "Easy", M: "Medium", H: "Hard" };
+const LEVEL_TITLES = { L0: "Thuần template", L1: "Biến thể", L2: "Combination / interview-ish" };
 
 export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter }) {
   const [expanded, setExpanded] = useState(new Set(["hash-prefix"]));
@@ -10,8 +11,11 @@ export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter
   const isDone = (problem) => problem.lc ? done.has(problem.lc) : csesDone.has(problem.cses);
   const core = LEVELLING_PROBLEMS.filter((problem) => problem.star);
   const coreDone = core.filter(isDone).length;
+  const lcCount = LEVELLING_PROBLEMS.filter((problem) => problem.lc).length;
+  const csesCount = LEVELLING_PROBLEMS.length - lcCount;
+  const practiceCount = LEVELLING_TOPICS.reduce((total, topic) => total + topic.problems.length, 0);
   const visibleProblems = (topic) => topic.problems.filter((problem) => {
-    if (level !== "all" && !problem.level.includes(level)) return false;
+    if (level !== "all" && problem.level !== level) return false;
     if (filter === "todo") return !isDone(problem);
     if (filter === "done") return isDone(problem);
     if (filter === "star") return problem.star;
@@ -28,24 +32,24 @@ export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter
     <section className="levelling" aria-label="Leetcode Levelling">
       <div className="levelling-intro">
         <h2>Học pattern từ L0 → L1 → L2</h2>
-        <p>62 bài · 12 topic · 58 LeetCode + 4 CSES. ★ Core 20: <strong>{coreDone}/20</strong> đã hoàn thành.</p>
+        <p>{LEVELLING_PROBLEMS.length} bài · {LEVELLING_TOPICS.length} topic · {lcCount} LeetCode + {csesCount} CSES. ★ Core {core.length}: <strong>{coreDone}/{core.length}</strong> đã hoàn thành.</p>
         <div className="level-guide">
-          <p><b>L0</b> Biết pattern, tập code template.</p>
-          <p><b>L1</b> Tự nhận ra một pattern chính trong khoảng 5 phút.</p>
-          <p><b>L2</b> Nhận pattern và biến đổi hoặc ghép thêm primitive.</p>
+          <p><b>L0</b> 3–5 bài thuần template.</p>
+          <p><b>L1</b> 3–5 bài biến thể, tự nhận pattern.</p>
+          <p><b>L2</b> 3–5 bài combination / interview-ish.</p>
         </div>
-        <p>Level luyện pattern khác với độ khó Easy/Medium/Hard. Các level chuyển tiếp được hiển thị nguyên bản.</p>
-        <p>Tick hoặc bỏ tick bài LeetCode trùng sẽ đồng bộ với tab LeetCode.</p>
-        <p className="levelling-review">Đi từ template → tự nhận pattern → ghép pattern. Với core 20, thử tự derive lại sau 2 tuần rồi luyện random problem và mock interview.</p>
+        <p>{practiceCount} lượt luyện: LC 42 có ở cả Two Pointers và Stack, dùng chung tiến độ và chỉ được tính một lần trong tổng số bài.</p>
+        <p>Tick hoặc bỏ tick bài LeetCode trùng sẽ đồng bộ với tab LeetCode. Level luyện pattern độc lập với độ khó Easy/Medium/Hard.</p>
+        <p className="levelling-review">Học sâu từng topic theo L0 → L1 → L2. Tự nhận đúng pattern và code được 3 bài liên tiếp → lên level tiếp; nếu liên tục gặp khó, quay lại thêm 1–2 bài level trước. Ưu tiên luyện đủ Two Pointers, Heap và DP.</p>
       </div>
 
       <div className="levelling-controls">
         <label htmlFor="levelling-level">Level</label>
         <select id="levelling-level" value={level} onChange={(event) => setLevel(event.target.value)}>
           <option value="all">Tất cả level</option>
-          <option value="L0">L0 (gồm L0/L1)</option>
-          <option value="L1">L1 (gồm level chuyển tiếp)</option>
-          <option value="L2">L2 (gồm L1/L2, L1+/L2)</option>
+          <option value="L0">L0 — Thuần template</option>
+          <option value="L1">L1 — Biến thể</option>
+          <option value="L2">L2 — Combination</option>
         </select>
         <button type="button" onClick={() => setExpanded(new Set(visibleTopics.map((topic) => topic.id)))}>Mở tất cả</button>
         <button type="button" onClick={() => setExpanded(new Set())}>Thu gọn</button>
@@ -69,33 +73,42 @@ export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter
             {isExpanded && (
               <div id={`levelling-${topic.id}`}>
                 <p className="levelling-note">{topic.note}</p>
-                {visible.map((problem, index) => {
-                  const completed = isDone(problem);
-                  const key = levellingKey(problem);
+                {Object.keys(LEVEL_TITLES).map((groupLevel) => {
+                  const problems = visible.filter((problem) => problem.level === groupLevel);
+                  if (problems.length === 0) return null;
+                  const allProblems = topic.problems.filter((problem) => problem.level === groupLevel);
+                  const levelDone = allProblems.filter(isDone).length;
                   return (
-                    <div key={key}>
-                      {problem.section && visible[index - 1]?.section !== problem.section && (
-                        <h3 className="levelling-subtopic">{problem.section}</h3>
-                      )}
-                      <div className={`levelling-problem${completed ? " is-done" : ""}`}
-                        onClick={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)}>
-                        <input type="checkbox" checked={completed}
-                          aria-label={`Hoàn thành ${problem.lc ? "LC" : "CSES"} ${problem.lc || problem.cses} — ${problem.title}`}
-                          onClick={(event) => event.stopPropagation()}
-                          onChange={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)} />
-                        <span className="levelling-level">{problem.level}</span>
-                        <div className="levelling-problem-info">
-                          <a href={levellingUrl(problem)} target="_blank" rel="noopener noreferrer"
-                            onClick={(event) => event.stopPropagation()}>
-                            {problem.star && <span className="levelling-star" aria-label="Core 20">★ </span>}
-                            <span className="levelling-problem-id">{problem.lc ? "LC" : "CSES"} {problem.lc || problem.cses}</span>
-                            {problem.title}
-                          </a>
-                          <p>{problem.focus}</p>
-                        </div>
-                        {problem.diff && <span className={`levelling-difficulty diff-${problem.diff}`}>{DIFFICULTIES[problem.diff]}</span>}
-                      </div>
-                    </div>
+                    <section key={groupLevel} className="levelling-level-group" aria-label={`${topic.name} ${groupLevel}`}>
+                      <h3 className="levelling-subtopic">
+                        <span>{groupLevel} — {topic.levelTitles?.[groupLevel] || LEVEL_TITLES[groupLevel]}</span>
+                        <span>{levelDone}/{allProblems.length}</span>
+                      </h3>
+                      {problems.map((problem) => {
+                        const completed = isDone(problem);
+                        const key = levellingKey(problem);
+                        return (
+                          <div key={key} className={`levelling-problem${completed ? " is-done" : ""}`}
+                            onClick={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)}>
+                            <input type="checkbox" checked={completed}
+                              aria-label={`Hoàn thành ${problem.lc ? "LC" : "CSES"} ${problem.lc || problem.cses} — ${problem.title}`}
+                              onClick={(event) => event.stopPropagation()}
+                              onChange={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)} />
+                            <span className="levelling-level">{problem.level}</span>
+                            <div className="levelling-problem-info">
+                              <a href={levellingUrl(problem)} target="_blank" rel="noopener noreferrer"
+                                onClick={(event) => event.stopPropagation()}>
+                                {problem.star && <span className="levelling-star" aria-label="Core 20">★ </span>}
+                                <span className="levelling-problem-id">{problem.lc ? "LC" : "CSES"} {problem.lc || problem.cses}</span>
+                                {problem.title}
+                              </a>
+                              <p>{problem.focus}</p>
+                            </div>
+                            {problem.diff && <span className={`levelling-difficulty diff-${problem.diff}`}>{DIFFICULTIES[problem.diff]}</span>}
+                          </div>
+                        );
+                      })}
+                    </section>
                   );
                 })}
               </div>

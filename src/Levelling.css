@@ -14,7 +14,8 @@
 .levelling-topic-name { flex: 1; font-weight: 600; font-size: 14px; }
 .levelling-topic-count { color: #d2a8ff; font-weight: 700; white-space: nowrap; }
 .levelling-note { margin: 0; padding: 12px 16px; color: var(--text2); background: var(--bg3); border-top: 1px solid var(--border); line-height: 1.7; }
-.levelling-subtopic { margin: 0; padding: 8px 16px; font-size: 12px; color: #d2a8ff; background: var(--bg3); }
+.levelling-subtopic { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0; padding: 10px 16px; font-size: 12px; color: #d2a8ff; background: var(--bg3); }
+.levelling-subtopic span:last-child { white-space: nowrap; }
 .levelling-problem { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid #21262d; cursor: pointer; }
 .levelling-problem:hover { background: var(--bg3); }
 .levelling-problem input { margin: 0; width: 18px; height: 18px; flex-shrink: 0; accent-color: #3fb950; cursor: pointer; }
