@@ -1,0 +1,42 @@
+.levelling { text-align: left; font-size: 13px; }
+.levelling-intro { padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg2); }
+.levelling-intro h2 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.levelling-intro p { color: var(--text2); line-height: 1.7; }
+.levelling-intro strong, .levelling-star { color: #ffa657; }
+.level-guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+.level-guide p { padding: 10px; background: var(--bg3); border-radius: 6px; }
+.level-guide b { display: block; color: #d2a8ff; }
+.levelling-intro .levelling-review { margin-top: 10px; color: var(--text); }
+.levelling-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.levelling-controls select, .levelling-controls button { font: inherit; color: var(--text); background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.levelling-topic { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg2); }
+.levelling-topic-header { display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 16px; font: inherit; color: var(--text); background: var(--bg2); border: 0; cursor: pointer; text-align: left; }
+.levelling-topic-name { flex: 1; font-weight: 600; font-size: 14px; }
+.levelling-topic-count { color: #d2a8ff; font-weight: 700; white-space: nowrap; }
+.levelling-note { margin: 0; padding: 12px 16px; color: var(--text2); background: var(--bg3); border-top: 1px solid var(--border); line-height: 1.7; }
+.levelling-subtopic { margin: 0; padding: 8px 16px; font-size: 12px; color: #d2a8ff; background: var(--bg3); }
+.levelling-problem { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid #21262d; cursor: pointer; }
+.levelling-problem:hover { background: var(--bg3); }
+.levelling-problem input { margin: 0; width: 18px; height: 18px; flex-shrink: 0; accent-color: #3fb950; cursor: pointer; }
+.levelling-level { flex-shrink: 0; min-width: 54px; padding: 2px 5px; text-align: center; font-size: 10px; font-weight: 700; border-radius: 4px; color: #d2a8ff; background: #d2a8ff18; }
+.levelling-problem-info { flex: 1; min-width: 0; }
+.levelling-problem-info a { font-size: 13px; color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
+.levelling-problem-info a:hover { text-decoration: underline; }
+.levelling-problem-id { margin-right: 8px; color: var(--text2); font: 11px monospace; white-space: nowrap; }
+.levelling-problem-info p { margin: 3px 0 0; color: var(--text2); font-size: 11px; line-height: 1.6; }
+.levelling-difficulty { flex-shrink: 0; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.diff-E { color: #3fb950; background: #3fb95018; }
+.diff-M { color: #d29922; background: #d2992218; }
+.diff-H { color: #f85149; background: #f8514918; }
+.levelling-problem.is-done { background: #3fb95008; }
+.is-done .levelling-problem-info a { color: var(--text2); text-decoration: line-through; }
+.levelling-empty { padding: 24px; text-align: center; color: var(--text2); }
+.levelling button:focus-visible, .levelling select:focus-visible, .levelling input:focus-visible, .levelling a:focus-visible { outline: 2px solid #d2a8ff; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .level-guide { grid-template-columns: 1fr; gap: 6px; }
+  .levelling-topic-header, .levelling-problem { padding: 12px 10px; gap: 7px; }
+  .levelling-level { min-width: 45px; padding: 2px 3px; }
+  .levelling-problem { flex-wrap: wrap; }
+  .levelling-problem-info { flex-basis: calc(100% - 90px); }
+  .levelling-difficulty { margin-left: 81px; }
+}
