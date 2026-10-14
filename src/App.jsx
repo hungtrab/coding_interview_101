@@ -1,8 +1,13 @@
 import { useState, useMemo } from "react";
 import Levelling from "./Levelling";
+import Qualcomm from "./Qualcomm";
 import { LEVELLING_PROBLEMS, levellingUrl } from "./data/levelling";
+import { QUALCOMM_PROBLEMS } from "./data/qualcomm";
 
-const LEVELLING_LC_LINKS = new Map(LEVELLING_PROBLEMS.filter((p) => p.lc).map((p) => [p.lc, levellingUrl(p)]));
+const LC_LINKS = new Map([
+  ...LEVELLING_PROBLEMS.filter((p) => p.lc).map((p) => [p.lc, levellingUrl(p)]),
+  ...QUALCOMM_PROBLEMS.map((p) => [p.lc, `https://leetcode.com/problems/${p.slug}/`]),
+]);
 
 const PHASES = [
   {
@@ -453,6 +458,8 @@ const toggleHr = (key) => setHrDone((prev) => {
   const lcDone = allLc.filter((p) => done.has(p.lc)).length;
   const hrTotal = allHr.length;
   const hrDoneCount = allHr.filter((p) => hrDone.has(p.key)).length;
+  const qualcommTotal = QUALCOMM_PROBLEMS.length;
+  const qualcommDone = QUALCOMM_PROBLEMS.filter((p) => done.has(p.lc)).length;
   const levellingTotal = LEVELLING_PROBLEMS.length;
   const levellingDone = LEVELLING_PROBLEMS.filter((p) => p.lc ? done.has(p.lc) : csesDone.has(p.cses)).length;
   const csesTotal = LEVELLING_PROBLEMS.filter((p) => p.cses).length;
@@ -480,6 +487,15 @@ const toggleHr = (key) => setHrDone((prev) => {
     return s;
   }, [done]);
 
+  const qualcommStats = useMemo(() => {
+    const s = { E: 0, M: 0, H: 0, Ed: 0, Md: 0, Hd: 0 };
+    QUALCOMM_PROBLEMS.forEach((p) => {
+      s[p.diff]++;
+      if (done.has(p.lc)) s[p.diff + "d"]++;
+    });
+    return s;
+  }, [done]);
+
   const shouldShow = (p, isDone) => {
     if (filter === "all") return true;
     if (filter === "todo") return !isDone;
@@ -488,9 +504,13 @@ const toggleHr = (key) => setHrDone((prev) => {
     return true;
   };
 
-  const currentStats = tab === "levelling" ? levellingStats : tab === "leetcode" ? stats : hrStats;
-  const currentTotal = tab === "levelling" ? levellingTotal : tab === "leetcode" ? lcTotal : hrTotal;
-  const currentDone = tab === "levelling" ? levellingDone : tab === "leetcode" ? lcDone : hrDoneCount;
+  const summaries = {
+    leetcode: { stats, total: lcTotal, completed: lcDone, color: "#58a6ff", gradient: "linear-gradient(90deg,#3fb950,#58a6ff)" },
+    levelling: { stats: levellingStats, total: levellingTotal, completed: levellingDone, color: "#d2a8ff", gradient: "linear-gradient(90deg,#58a6ff,#d2a8ff)" },
+    qualcomm: { stats: qualcommStats, total: qualcommTotal, completed: qualcommDone, color: "#58a6ff", gradient: "linear-gradient(90deg,#58a6ff,#79c0ff)" },
+    hackerrank: { stats: hrStats, total: hrTotal, completed: hrDoneCount, color: "#2ec866", gradient: "linear-gradient(90deg,#1ba94c,#2ec866)" },
+  };
+  const { stats: currentStats, total: currentTotal, completed: currentDone, color: progressColor, gradient: progressGradient } = summaries[tab];
   const progressPct = (currentDone / currentTotal) * 100;
 
   return (
@@ -508,7 +528,7 @@ const toggleHr = (key) => setHrDone((prev) => {
 
         {/* Tabs */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 0, margin: "14px 0 14px", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", width: "fit-content", maxWidth: "100%" }}>
-          {[["leetcode", `LeetCode (${lcDone}/${lcTotal})`, "#ffa116"], ["levelling", `Leetcode Levelling (${levellingDone}/${levellingTotal})`, "#d2a8ff"], ["hackerrank", `HackerRank (${hrDoneCount}/${hrTotal})`, "#1ba94c"]].map(([id, label, clr]) => (
+          {[["leetcode", `LeetCode (${lcDone}/${lcTotal})`, "#ffa116"], ["levelling", `Leetcode Levelling (${levellingDone}/${levellingTotal})`, "#d2a8ff"], ["qualcomm", `Qualcomm (${qualcommDone}/${qualcommTotal})`, "#58a6ff"], ["hackerrank", `HackerRank (${hrDoneCount}/${hrTotal})`, "#1ba94c"]].map(([id, label, clr]) => (
             <button key={id} onClick={() => { setTab(id); setFilter("all"); }}
               style={{
                 padding: "8px 18px", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
@@ -525,10 +545,10 @@ const toggleHr = (key) => setHrDone((prev) => {
           <div style={{ flex: 1, height: 8, background: "var(--bg3)", borderRadius: 4, overflow: "hidden" }}>
             <div style={{
               width: `${progressPct}%`, height: "100%", borderRadius: 4, transition: "width 0.3s",
-              background: tab === "levelling" ? "linear-gradient(90deg,#58a6ff,#d2a8ff)" : tab === "leetcode" ? "linear-gradient(90deg,#3fb950,#58a6ff)" : "linear-gradient(90deg,#1ba94c,#2ec866)",
+              background: progressGradient,
             }} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 600, color: tab === "levelling" ? "#d2a8ff" : tab === "leetcode" ? "#58a6ff" : "#2ec866", minWidth: 55, textAlign: "right" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: progressColor, minWidth: 55, textAlign: "right" }}>
             {currentDone}/{currentTotal}
           </span>
         </div>
@@ -544,7 +564,7 @@ const toggleHr = (key) => setHrDone((prev) => {
             {tab === "levelling" && <span style={{ color: "#d2a8ff" }}>CSES: <b>{csesDoneCount}/{csesTotal}</b></span>}
           </div>
           <div style={{ display: "flex", gap: 4 }}>
-            {(tab !== "hackerrank"
+            {(tab === "leetcode" || tab === "levelling"
               ? [["all", "Tất cả"], ["todo", "Chưa làm"], ["done", "Đã làm"], ["star", "★ Must-do"]]
               : [["all", "Tất cả"], ["todo", "Chưa làm"], ["done", "Đã làm"]]
             ).map(([val, label]) => (
@@ -645,7 +665,7 @@ const toggleHr = (key) => setHrDone((prev) => {
                             }}>{done.has(p.lc) && "✓"}</span>
                             {p.star && <span style={{ fontSize: 13, flexShrink: 0 }}>⭐</span>}
                             <span style={{ fontSize: 11, color: "var(--text2)", minWidth: 36, flexShrink: 0, fontFamily: "monospace" }}>#{p.lc}</span>
-                            <a href={LEVELLING_LC_LINKS.get(p.lc) || `https://leetcode.com/problems/${lcSlug(p.title)}/`} target="_blank" rel="noopener noreferrer"
+                            <a href={LC_LINKS.get(p.lc) || `https://leetcode.com/problems/${lcSlug(p.title)}/`} target="_blank" rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
                               style={{
                                 flex: 1, fontSize: 13, color: "var(--text)",
@@ -681,6 +701,8 @@ const toggleHr = (key) => setHrDone((prev) => {
         {tab === "levelling" && (
           <Levelling done={done} csesDone={csesDone} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} />
         )}
+
+        {tab === "qualcomm" && <Qualcomm done={done} toggleLc={toggleLc} filter={filter} />}
 
         {/* === HACKERRANK TAB === */}
         {tab === "hackerrank" && HR_TOPICS.map((topic, ti) => {

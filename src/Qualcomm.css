@@ -1,0 +1,25 @@
+.qualcomm { text-align: left; font-size: 13px; color-scheme: dark; }
+.qualcomm-intro { padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg2); }
+.qualcomm-intro h2 { margin-bottom: 8px; font-size: 17px; font-weight: 700; color: var(--text); }
+.qualcomm-intro p { color: var(--text2); line-height: 1.7; }
+.qualcomm-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg2); }
+.qualcomm-problem { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; }
+.qualcomm-problem + .qualcomm-problem { border-top: 1px solid #21262d; }
+.qualcomm-problem:hover { background: var(--bg3); }
+.qualcomm-problem input { width: 18px; height: 18px; margin: 0; flex-shrink: 0; accent-color: #3fb950; cursor: pointer; }
+.qualcomm-id { min-width: 40px; flex-shrink: 0; color: var(--text2); font: 11px monospace; }
+.qualcomm-problem a { flex: 1; min-width: 0; color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
+.qualcomm-problem a:hover { text-decoration: underline; }
+.qualcomm-premium { font-size: 11px; flex-shrink: 0; }
+.qualcomm-difficulty { flex-shrink: 0; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.qualcomm-difficulty.diff-E { color: #3fb950; background: #3fb95018; }
+.qualcomm-difficulty.diff-M { color: #d29922; background: #d2992218; }
+.qualcomm-difficulty.diff-H { color: #f85149; background: #f8514918; }
+.qualcomm-problem.is-done { background: #3fb95008; }
+.qualcomm-problem.is-done a { color: var(--text2); text-decoration: line-through; }
+.qualcomm-empty { padding: 24px; color: var(--text2); text-align: center; }
+.qualcomm input:focus-visible, .qualcomm a:focus-visible { outline: 2px solid #58a6ff; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .qualcomm-problem { padding: 12px 10px; gap: 7px; }
+  .qualcomm-id { min-width: 34px; }
+}

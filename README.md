@@ -6,12 +6,13 @@
 
 - Roadmap LeetCode theo 4 phase: nền tảng, core patterns, graph/DP, bit manipulation và advanced topics.
 - Tab **Leetcode Levelling** gồm 145 bài khác nhau (141 LeetCode + 4 CSES), chia thành 146 lượt luyện theo 12 topic. Mỗi topic có 3–5 bài ở từng level L0, L1, L2, kèm mục tiêu học và ★ core 20.
+- Tab **Qualcomm** gồm 62 bài LeetCode theo đúng danh sách và thứ tự đã chọn, với 28 Easy, 25 Medium, 9 Hard; có link trực tiếp, nhãn Premium, bộ lọc trạng thái và thống kê tiến độ riêng.
 - Danh sách HackerRank theo nhóm kỹ năng: warm-up, array/sorting, string, hashmap/search, stack/queue, tree/graph, dynamic programming, greedy.
 - Bộ lọc bài: tất cả, chưa làm, đã làm, và nhóm must-do cho LeetCode/Levelling. Tab Levelling có thêm bộ lọc level, mở tất cả hoặc thu gọn topic.
 - Thanh tiến độ tổng và thống kê theo độ khó Easy, Medium, Hard.
 - Checklist lưu bằng `localStorage`, nên tiến độ được giữ lại trên cùng trình duyệt.
 - Link trực tiếp tới từng bài để luyện nhanh.
-- Tick hoặc bỏ tick bài trùng giữa LeetCode và Levelling sẽ đồng bộ hai chiều, kể cả các bài xuất hiện ở nhiều topic. Tiến độ cũ được giữ lại.
+- Tick hoặc bỏ tick bài trùng giữa LeetCode, Levelling và Qualcomm sẽ đồng bộ giữa cả ba tab, kể cả các bài xuất hiện ở nhiều topic. Tiến độ cũ được giữ lại.
 
 ## Leetcode Levelling
 
@@ -85,8 +86,11 @@ npm run lint
 │   ├── App.jsx     # Roadmap, data bài tập, UI tracker
 │   ├── Levelling.jsx # UI học pattern theo level
 │   ├── Levelling.css
+│   ├── Qualcomm.jsx # Danh sách bài Qualcomm, dùng chung tiến độ LC
+│   ├── Qualcomm.css
 │   ├── data/
-│   │   └── levelling.js # 12 topic, level, core 20, link LeetCode/CSES
+│   │   ├── levelling.js # 12 topic, level, core 20, link LeetCode/CSES
+│   │   └── qualcomm.js # 62 bài Qualcomm theo thứ tự đã chọn
 │   ├── App.css
 │   ├── index.css
 │   └── main.jsx
@@ -98,7 +102,7 @@ npm run lint
 
 Tiến độ làm bài được lưu trong trình duyệt bằng `localStorage` với ba key:
 
-- `lc-done` cho LeetCode, dùng chung giữa tab LeetCode và Levelling theo số bài LC
+- `lc-done` cho LeetCode, dùng chung giữa tab LeetCode, Levelling và Qualcomm theo số bài LC
 - `hr-done` cho HackerRank
 - `cses-done` cho các bài CSES trong Levelling
 
