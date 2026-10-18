@@ -10,7 +10,8 @@
 - Danh sách HackerRank theo nhóm kỹ năng: warm-up, array/sorting, string, hashmap/search, stack/queue, tree/graph, dynamic programming, greedy.
 - Bộ lọc bài: tất cả, chưa làm, đã làm, và nhóm must-do cho LeetCode/Levelling. Tab Levelling có thêm bộ lọc level, mở tất cả hoặc thu gọn topic.
 - Thanh tiến độ tổng và thống kê theo độ khó Easy, Medium, Hard.
-- Checklist lưu bằng `localStorage`, nên tiến độ được giữ lại trên cùng trình duyệt.
+- Mỗi bài có **3 checkbox độc lập** cho 3 lượt ôn: **1/3 xanh dương**, **2/3 vàng**, **3/3 xanh lá**. Chỉ đủ 3 tick mới được tính hoàn thành, gạch tên và đưa vào bộ lọc “Đã làm”; bài 0–2 tick vẫn ở “Chưa làm”.
+- Checklist lưu bằng `localStorage`, nên cả 3 checkbox được giữ lại trên cùng trình duyệt. Quy tắc này áp dụng cho LeetCode, Levelling, Qualcomm, CSES và HackerRank.
 - Link trực tiếp tới từng bài để luyện nhanh.
 - Tick hoặc bỏ tick bài trùng giữa LeetCode, Levelling và Qualcomm sẽ đồng bộ giữa cả ba tab, kể cả các bài xuất hiện ở nhiều topic. Tiến độ cũ được giữ lại.
 
@@ -77,6 +78,12 @@ npm run preview
 npm run lint
 ```
 
+Kiểm tra logic 3 checkbox và chuyển đổi tiến độ cũ:
+
+```bash
+npm test
+```
+
 ## Cấu trúc thư mục
 
 ```text
@@ -88,6 +95,10 @@ npm run lint
 │   ├── Levelling.css
 │   ├── Qualcomm.jsx # Danh sách bài Qualcomm, dùng chung tiến độ LC
 │   ├── Qualcomm.css
+│   ├── ProblemChecks.jsx # 3 checkbox dùng chung
+│   ├── ProblemChecks.css # Màu theo số lượt ôn
+│   ├── progress.js     # Chuyển đổi và cập nhật tiến độ
+│   ├── useProblemProgress.js # Lưu tiến độ và suy ra bài hoàn thành
 │   ├── data/
 │   │   ├── levelling.js # 12 topic, level, core 20, link LeetCode/CSES
 │   │   └── qualcomm.js # 62 bài Qualcomm theo thứ tự đã chọn
@@ -100,10 +111,14 @@ npm run lint
 
 ## Ghi chú sử dụng
 
-Tiến độ làm bài được lưu trong trình duyệt bằng `localStorage` với ba key:
+Tiến độ 3 checkbox được lưu trong trình duyệt bằng `localStorage` với ba key có phiên bản:
 
-- `lc-done` cho LeetCode, dùng chung giữa tab LeetCode, Levelling và Qualcomm theo số bài LC
-- `hr-done` cho HackerRank
-- `cses-done` cho các bài CSES trong Levelling
+- `lc-progress-v2` cho LeetCode, dùng chung giữa tab LeetCode, Levelling và Qualcomm theo số bài LC
+- `hr-progress-v2` cho HackerRank
+- `cses-progress-v2` cho các bài CSES trong Levelling
 
-Nếu muốn reset tiến độ, có thể xóa site data của trình duyệt hoặc xóa các key này trong DevTools.
+Mỗi key chứa `{ version: 2, checks: { ... } }`; mỗi bài lưu trạng thái độc lập của 3 ô bằng bitmask từ 1 đến 7, bài chưa tick được bỏ khỏi object. Mọi bộ đếm (tổng, độ khó, topic, level, core 20) chỉ tính bài có đủ 3 tick.
+
+Lần đầu dùng bản mới, các bài đã tick trong `lc-done`, `hr-done`, `cses-done` được chuyển thành **1/3** (một lượt đã làm). Dữ liệu cũ được giữ nguyên làm bản lưu; sau chuyển đổi ứng dụng dùng các key `*-progress-v2`, kể cả khi bỏ hết tick. Để reset hoàn toàn, xóa cả key mới và key cũ, hoặc xóa site data.
+
+Mỗi ô có thể tick/bỏ tick riêng bằng chuột hoặc phím Space; nhấn link hoặc nội dung dòng không làm thay đổi checklist.

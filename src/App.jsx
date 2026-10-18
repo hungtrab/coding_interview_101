@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import Levelling from "./Levelling";
 import Qualcomm from "./Qualcomm";
+import ProblemChecks from "./ProblemChecks";
+import useProblemProgress from "./useProblemProgress";
+import { countChecks } from "./progress";
 import { LEVELLING_PROBLEMS, levellingUrl } from "./data/levelling";
 import { QUALCOMM_PROBLEMS } from "./data/qualcomm";
 
@@ -403,44 +406,9 @@ function lcSlug(title) {
 }
 
 export default function DSARoadmap() {
-  const [done, setDone] = useState(() => {
-  try {
-    const saved = JSON.parse(localStorage.getItem("lc-done") || "[]");
-    return new Set(saved);
-  } catch { return new Set(); }
-});
-
-// Thêm ngay dưới:
-const toggleLc = (lc) => setDone((prev) => {
-  const next = new Set(prev);
-  next.has(lc) ? next.delete(lc) : next.add(lc);
-  localStorage.setItem("lc-done", JSON.stringify([...next]));
-  return next;
-});
-const [hrDone, setHrDone] = useState(() => {
-  try {
-    const saved = JSON.parse(localStorage.getItem("hr-done") || "[]");
-    return new Set(saved);
-  } catch { return new Set(); }
-});
-
-const toggleHr = (key) => setHrDone((prev) => {
-  const next = new Set(prev);
-  next.has(key) ? next.delete(key) : next.add(key);
-  localStorage.setItem("hr-done", JSON.stringify([...next]));
-  return next;
-});
-  const [csesDone, setCsesDone] = useState(() => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem("cses-done") || "[]"));
-    } catch { return new Set(); }
-  });
-  const toggleCses = (id) => setCsesDone((prev) => {
-    const next = new Set(prev);
-    next.has(id) ? next.delete(id) : next.add(id);
-    localStorage.setItem("cses-done", JSON.stringify([...next]));
-    return next;
-  });
+  const { checks: lcChecks, done, toggle: toggleLc } = useProblemProgress("lc");
+  const { checks: hrChecks, done: hrDone, toggle: toggleHr } = useProblemProgress("hr");
+  const { checks: csesChecks, done: csesDone, toggle: toggleCses } = useProblemProgress("cses");
   const [expandedPhase, setExpandedPhase] = useState("p1");
   const [expandedHr, setExpandedHr] = useState("0");
   const [filter, setFilter] = useState("all");
@@ -578,6 +546,12 @@ const toggleHr = (key) => setHrDone((prev) => {
             ))}
           </div>
         </div>
+        <div className="progress-guide" aria-label="Màu tiến độ ôn tập">
+          <span>Mỗi bài cần đủ 3 tick:</span>
+          <span>1/3 · Xanh dương</span>
+          <span>2/3 · Vàng</span>
+          <span>3/3 · Xanh lá — Hoàn thành</span>
+        </div>
       </div>
 
       {/* Must-do banner (LC only) */}
@@ -648,21 +622,14 @@ const toggleHr = (key) => setHrDone((prev) => {
                           </span>
                         </div>
                         {visible.map((p) => (
-                          <div key={p.id} onClick={() => toggleLc(p.lc)}
+                          <div key={p.id} className="problem-row" data-progress={countChecks(lcChecks[p.lc])}
                             style={{
                               display: "flex", alignItems: "center", gap: 10,
-                              padding: "9px 16px 9px 20px", cursor: "pointer",
-                              background: done.has(p.lc) ? "#3fb95008" : "var(--bg2)",
+                              padding: "9px 16px 9px 20px",
                               borderBottom: "1px solid #21262d",
-                              opacity: done.has(p.lc) ? 0.55 : 1, transition: "all 0.15s",
+                              transition: "all 0.15s",
                             }}>
-                            <span style={{
-                              width: 18, height: 18, borderRadius: 4, flexShrink: 0,
-                              border: done.has(p.lc) ? "2px solid #3fb950" : "2px solid var(--border)",
-                              background: done.has(p.lc) ? "#3fb950" : "transparent",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              fontSize: 11, color: "#0d1117", fontWeight: 700,
-                            }}>{done.has(p.lc) && "✓"}</span>
+                            <ProblemChecks mask={lcChecks[p.lc]} name={`LC ${p.lc} — ${p.title}`} onToggle={(index) => toggleLc(p.lc, index)} />
                             {p.star && <span style={{ fontSize: 13, flexShrink: 0 }}>⭐</span>}
                             <span style={{ fontSize: 11, color: "var(--text2)", minWidth: 36, flexShrink: 0, fontFamily: "monospace" }}>#{p.lc}</span>
                             <a href={LC_LINKS.get(p.lc) || `https://leetcode.com/problems/${lcSlug(p.title)}/`} target="_blank" rel="noopener noreferrer"
@@ -699,10 +666,10 @@ const toggleHr = (key) => setHrDone((prev) => {
         })}
 
         {tab === "levelling" && (
-          <Levelling done={done} csesDone={csesDone} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} />
+          <Levelling done={done} csesDone={csesDone} lcChecks={lcChecks} csesChecks={csesChecks} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} />
         )}
 
-        {tab === "qualcomm" && <Qualcomm done={done} toggleLc={toggleLc} filter={filter} />}
+        {tab === "qualcomm" && <Qualcomm done={done} lcChecks={lcChecks} toggleLc={toggleLc} filter={filter} />}
 
         {/* === HACKERRANK TAB === */}
         {tab === "hackerrank" && HR_TOPICS.map((topic, ti) => {
@@ -734,21 +701,14 @@ const toggleHr = (key) => setHrDone((prev) => {
                     const key = `${ti}-${actualIdx}`;
                     const isDone = hrDone.has(key);
                     return (
-                      <div key={pi} onClick={() => toggleHr(key)}
+                      <div key={pi} className="problem-row" data-progress={countChecks(hrChecks[key])}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "9px 16px 9px 20px", cursor: "pointer",
-                          background: isDone ? "#3fb95008" : "var(--bg2)",
+                          padding: "9px 16px 9px 20px",
                           borderBottom: "1px solid #21262d",
-                          opacity: isDone ? 0.55 : 1, transition: "all 0.15s",
+                          transition: "all 0.15s",
                         }}>
-                        <span style={{
-                          width: 18, height: 18, borderRadius: 4, flexShrink: 0,
-                          border: isDone ? "2px solid #3fb950" : "2px solid var(--border)",
-                          background: isDone ? "#3fb950" : "transparent",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, color: "#0d1117", fontWeight: 700,
-                        }}>{isDone && "✓"}</span>
+                        <ProblemChecks mask={hrChecks[key]} name={`HackerRank — ${p.title}`} onToggle={(index) => toggleHr(key, index)} />
                         <a href={p.url} target="_blank" rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           style={{

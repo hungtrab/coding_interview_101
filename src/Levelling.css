@@ -29,7 +29,6 @@
 .diff-E { color: #3fb950; background: #3fb95018; }
 .diff-M { color: #d29922; background: #d2992218; }
 .diff-H { color: #f85149; background: #f8514918; }
-.levelling-problem.is-done { background: #3fb95008; }
 .is-done .levelling-problem-info a { color: var(--text2); text-decoration: line-through; }
 .levelling-empty { padding: 24px; text-align: center; color: var(--text2); }
 .levelling button:focus-visible, .levelling select:focus-visible, .levelling input:focus-visible, .levelling a:focus-visible { outline: 2px solid #d2a8ff; outline-offset: 3px; }

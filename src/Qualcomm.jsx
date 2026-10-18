@@ -1,9 +1,11 @@
 import { QUALCOMM_PROBLEMS } from "./data/qualcomm";
+import ProblemChecks from "./ProblemChecks";
+import { countChecks } from "./progress";
 import "./Qualcomm.css";
 
 const DIFFICULTIES = { E: "Easy", M: "Medium", H: "Hard" };
 
-export default function Qualcomm({ done, toggleLc, filter }) {
+export default function Qualcomm({ done, lcChecks, toggleLc, filter }) {
   const visible = QUALCOMM_PROBLEMS.filter((problem) => {
     if (filter === "todo") return !done.has(problem.lc);
     if (filter === "done") return done.has(problem.lc);
@@ -24,12 +26,10 @@ export default function Qualcomm({ done, toggleLc, filter }) {
           {visible.map((problem) => {
             const completed = done.has(problem.lc);
             return (
-              <div key={problem.lc} className={`qualcomm-problem${completed ? " is-done" : ""}`}
-                onClick={() => toggleLc(problem.lc)}>
-                <input type="checkbox" checked={completed}
-                  aria-label={`Hoàn thành LC ${problem.lc} — ${problem.title}`}
-                  onClick={(event) => event.stopPropagation()}
-                  onChange={() => toggleLc(problem.lc)} />
+              <div key={problem.lc} className={`problem-row qualcomm-problem${completed ? " is-done" : ""}`}
+                data-progress={countChecks(lcChecks[problem.lc])}>
+                <ProblemChecks mask={lcChecks[problem.lc]} name={`LC ${problem.lc} — ${problem.title}`}
+                  onToggle={(index) => toggleLc(problem.lc, index)} />
                 <span className="qualcomm-id">#{problem.lc}</span>
                 <a href={`https://leetcode.com/problems/${problem.slug}/`} target="_blank" rel="noopener noreferrer"
                   onClick={(event) => event.stopPropagation()}>{problem.title}</a>

@@ -1,11 +1,13 @@
 import { useState } from "react";
+import ProblemChecks from "./ProblemChecks";
+import { countChecks } from "./progress";
 import { LEVELLING_PROBLEMS, LEVELLING_TOPICS, levellingKey, levellingUrl } from "./data/levelling";
 import "./Levelling.css";
 
 const DIFFICULTIES = { E: "Easy", M: "Medium", H: "Hard" };
 const LEVEL_TITLES = { L0: "Thuần template", L1: "Biến thể", L2: "Combination / interview-ish" };
 
-export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter }) {
+export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggleLc, toggleCses, filter }) {
   const [expanded, setExpanded] = useState(new Set(["hash-prefix"]));
   const [level, setLevel] = useState("all");
   const isDone = (problem) => problem.lc ? done.has(problem.lc) : csesDone.has(problem.cses);
@@ -87,13 +89,12 @@ export default function Levelling({ done, csesDone, toggleLc, toggleCses, filter
                       {problems.map((problem) => {
                         const completed = isDone(problem);
                         const key = levellingKey(problem);
+                        const mask = problem.lc ? lcChecks[problem.lc] : csesChecks[problem.cses];
                         return (
-                          <div key={key} className={`levelling-problem${completed ? " is-done" : ""}`}
-                            onClick={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)}>
-                            <input type="checkbox" checked={completed}
-                              aria-label={`Hoàn thành ${problem.lc ? "LC" : "CSES"} ${problem.lc || problem.cses} — ${problem.title}`}
-                              onClick={(event) => event.stopPropagation()}
-                              onChange={() => problem.lc ? toggleLc(problem.lc) : toggleCses(problem.cses)} />
+                          <div key={key} className={`problem-row levelling-problem${completed ? " is-done" : ""}`}
+                            data-progress={countChecks(mask)}>
+                            <ProblemChecks mask={mask} name={`${problem.lc ? "LC" : "CSES"} ${problem.lc || problem.cses} — ${problem.title}`}
+                              onToggle={(index) => problem.lc ? toggleLc(problem.lc, index) : toggleCses(problem.cses, index)} />
                             <span className="levelling-level">{problem.level}</span>
                             <div className="levelling-problem-info">
                               <a href={levellingUrl(problem)} target="_blank" rel="noopener noreferrer"

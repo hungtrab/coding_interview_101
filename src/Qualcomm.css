@@ -15,7 +15,6 @@
 .qualcomm-difficulty.diff-E { color: #3fb950; background: #3fb95018; }
 .qualcomm-difficulty.diff-M { color: #d29922; background: #d2992218; }
 .qualcomm-difficulty.diff-H { color: #f85149; background: #f8514918; }
-.qualcomm-problem.is-done { background: #3fb95008; }
 .qualcomm-problem.is-done a { color: var(--text2); text-decoration: line-through; }
 .qualcomm-empty { padding: 24px; color: var(--text2); text-align: center; }
 .qualcomm input:focus-visible, .qualcomm a:focus-visible { outline: 2px solid #58a6ff; outline-offset: 3px; }

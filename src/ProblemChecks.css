@@ -1,0 +1,27 @@
+.problem-row[data-progress] { cursor: default; transition: background-color 0.15s; }
+.problem-row[data-progress="0"] { background: var(--bg2); }
+.problem-row[data-progress="1"], .problem-row[data-progress="1"]:hover { background: #172e45; box-shadow: inset 3px 0 #58a6ff; }
+.problem-row[data-progress="2"], .problem-row[data-progress="2"]:hover { background: #3b3018; box-shadow: inset 3px 0 #d29922; }
+.problem-row[data-progress="3"], .problem-row[data-progress="3"]:hover { background: #183a26; box-shadow: inset 3px 0 #3fb950; }
+.problem-checks { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; color-scheme: dark; }
+.problem-checks label { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; font-size: 9px; color: var(--text2); line-height: 1.2; }
+.problem-checks input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #58a6ff; }
+[data-progress="2"] .problem-checks input { accent-color: #d29922; }
+[data-progress="3"] .problem-checks input { accent-color: #3fb950; }
+.problem-checks input:focus-visible { outline: 2px solid #58a6ff; outline-offset: 3px; }
+.problem-check-count { min-width: 24px; font: 10px monospace; color: var(--text2); }
+[data-progress="1"] .problem-check-count { color: #79c0ff; }
+[data-progress="2"] .problem-check-count { color: #e3b341; }
+[data-progress="3"] .problem-check-count { color: #56d364; }
+.progress-guide { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 11px; color: var(--text2); }
+.progress-guide span { white-space: nowrap; }
+.progress-guide span:nth-child(2) { color: #79c0ff; }
+.progress-guide span:nth-child(3) { color: #e3b341; }
+.progress-guide span:nth-child(4) { color: #56d364; }
+@media (max-width: 600px) {
+  .problem-row[data-progress] { flex-wrap: wrap; }
+  .problem-row > .problem-checks { flex-basis: 100%; }
+  .problem-row > a { min-width: 80px; overflow-wrap: anywhere; }
+  .problem-row.levelling-problem .levelling-problem-info { flex-basis: calc(100% - 70px); }
+  .problem-row.levelling-problem .levelling-difficulty { margin-left: 0; }
+}
