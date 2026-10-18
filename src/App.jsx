@@ -562,7 +562,7 @@ export default function DSARoadmap() {
           const pProblems = phase.topics.flatMap((t) => t.problems).filter((p) => {
             if (p.skip || seen.has(p.lc)) return false; seen.add(p.lc); return true;
           });
-          const pDone = pProblems.filter((p) => done.has(p.lc)).length;
+          const pCount = pProblems.filter((p) => countChecks(lcChecks[p.lc]) === countMode).length;
           const pTotal = pProblems.length;
 
           return (
@@ -579,8 +579,8 @@ export default function DSARoadmap() {
                 </span>
                 <span style={{ flex: 1, fontWeight: 600, fontSize: 14 }}>{phase.title}</span>
                 <span style={{ fontSize: 11, color: "var(--text2)" }}>{phase.weeks}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: pDone === pTotal ? "#3fb950" : phase.color }}>
-                  {pDone}/{pTotal}
+                <span style={{ fontSize: 12, fontWeight: 700, color: currentMode.color }}>
+                  {pCount}/{pTotal}
                 </span>
                 <span style={{ transition: "transform 0.2s", transform: isExp ? "rotate(180deg)" : "rotate(0)", fontSize: 12, color: "var(--text2)" }}>▼</span>
               </button>
@@ -589,17 +589,18 @@ export default function DSARoadmap() {
                 <div style={{ border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 10px 10px", overflow: "hidden" }}>
                   {phase.topics.map((topic, ti) => {
                     const seenT = new Set();
-                    const visible = topic.problems
-                      .filter((p) => { if (p.skip || seenT.has(p.lc)) return false; seenT.add(p.lc); return true; })
-                      .filter((p) => shouldShow(p, done.has(p.lc)));
+                    const tProblems = topic.problems
+                      .filter((p) => { if (p.skip || seenT.has(p.lc)) return false; seenT.add(p.lc); return true; });
+                    const tCount = tProblems.filter((p) => countChecks(lcChecks[p.lc]) === countMode).length;
+                    const visible = tProblems.filter((p) => shouldShow(p, done.has(p.lc)));
                     if (visible.length === 0 && filter !== "all") return null;
                     return (
                       <div key={ti}>
                         <div style={{ padding: "10px 16px", background: "var(--bg3)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 8 }}>
                           <span>{topic.icon}</span>
                           <span style={{ fontWeight: 600, fontSize: 13 }}>{topic.name}</span>
-                          <span style={{ fontSize: 11, color: "var(--text2)" }}>
-                            ({topic.problems.filter((p) => !p.skip && done.has(p.lc)).length}/{topic.problems.filter((p) => !p.skip).length})
+                          <span style={{ fontSize: 11, color: currentMode.color }}>
+                            ({tCount}/{tProblems.length})
                           </span>
                         </div>
                         {visible.map((p) => (
@@ -647,7 +648,7 @@ export default function DSARoadmap() {
         })}
 
         {tab === "levelling" && (
-          <Levelling done={done} csesDone={csesDone} lcChecks={lcChecks} csesChecks={csesChecks} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} />
+          <Levelling done={done} csesDone={csesDone} lcChecks={lcChecks} csesChecks={csesChecks} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} countMode={countMode} countColor={currentMode.color} />
         )}
 
         {tab === "qualcomm" && <Qualcomm done={done} lcChecks={lcChecks} toggleLc={toggleLc} filter={filter} />}
@@ -655,7 +656,7 @@ export default function DSARoadmap() {
         {/* === HACKERRANK TAB === */}
         {tab === "hackerrank" && HR_TOPICS.map((topic, ti) => {
           const isExp = expandedHr === String(ti);
-          const tDone = topic.problems.filter((_, pi) => hrDone.has(`${ti}-${pi}`)).length;
+          const tCount = topic.problems.filter((_, pi) => countChecks(hrChecks[`${ti}-${pi}`]) === countMode).length;
           const visible = topic.problems.filter((p, pi) => shouldShow(p, hrDone.has(`${ti}-${pi}`)));
 
           return (
@@ -669,8 +670,8 @@ export default function DSARoadmap() {
                 }}>
                 <span style={{ fontSize: 16 }}>{topic.icon}</span>
                 <span style={{ flex: 1, fontWeight: 600, fontSize: 14 }}>{topic.name}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: tDone === topic.problems.length ? "#3fb950" : "#2ec866" }}>
-                  {tDone}/{topic.problems.length}
+                <span style={{ fontSize: 12, fontWeight: 700, color: currentMode.color }}>
+                  {tCount}/{topic.problems.length}
                 </span>
                 <span style={{ transition: "transform 0.2s", transform: isExp ? "rotate(180deg)" : "rotate(0)", fontSize: 12, color: "var(--text2)" }}>▼</span>
               </button>

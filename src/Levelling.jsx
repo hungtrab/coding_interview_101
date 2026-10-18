@@ -7,12 +7,13 @@ import "./Levelling.css";
 const DIFFICULTIES = { E: "Easy", M: "Medium", H: "Hard" };
 const LEVEL_TITLES = { L0: "Thuần template", L1: "Biến thể", L2: "Combination / interview-ish" };
 
-export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggleLc, toggleCses, filter }) {
+export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggleLc, toggleCses, filter, countMode, countColor }) {
   const [expanded, setExpanded] = useState(new Set(["hash-prefix"]));
   const [level, setLevel] = useState("all");
   const isDone = (problem) => problem.lc ? done.has(problem.lc) : csesDone.has(problem.cses);
+  const matchesCountMode = (problem) => countChecks(problem.lc ? lcChecks[problem.lc] : csesChecks[problem.cses]) === countMode;
   const core = LEVELLING_PROBLEMS.filter((problem) => problem.star);
-  const coreDone = core.filter(isDone).length;
+  const coreCount = core.filter(matchesCountMode).length;
   const lcCount = LEVELLING_PROBLEMS.filter((problem) => problem.lc).length;
   const csesCount = LEVELLING_PROBLEMS.length - lcCount;
   const practiceCount = LEVELLING_TOPICS.reduce((total, topic) => total + topic.problems.length, 0);
@@ -34,7 +35,7 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
     <section className="levelling" aria-label="Leetcode Levelling">
       <div className="levelling-intro">
         <h2>Học pattern từ L0 → L1 → L2</h2>
-        <p>{LEVELLING_PROBLEMS.length} bài · {LEVELLING_TOPICS.length} topic · {lcCount} LeetCode + {csesCount} CSES. ★ Core {core.length}: <strong>{coreDone}/{core.length}</strong> đã hoàn thành.</p>
+        <p>{LEVELLING_PROBLEMS.length} bài · {LEVELLING_TOPICS.length} topic · {lcCount} LeetCode + {csesCount} CSES. ★ Core {core.length}: <strong style={{ color: countColor }}>{coreCount}/{core.length}</strong> theo màu đang chọn ({countMode}/3).</p>
         <div className="level-guide">
           <p><b>L0</b> 3–5 bài thuần template.</p>
           <p><b>L1</b> 3–5 bài biến thể, tự nhận pattern.</p>
@@ -60,7 +61,7 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
       {visibleTopics.length === 0 && <p className="levelling-empty">Không có bài phù hợp với bộ lọc hiện tại.</p>}
       {visibleTopics.map((topic) => {
         const visible = visibleProblems(topic);
-        const topicDone = topic.problems.filter(isDone).length;
+        const topicCount = topic.problems.filter(matchesCountMode).length;
         const isExpanded = expanded.has(topic.id);
         return (
           <div key={topic.id} className="levelling-topic">
@@ -69,7 +70,7 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
               onClick={() => toggleTopic(topic.id)}>
               <span>{topic.icon}</span>
               <span className="levelling-topic-name">{LEVELLING_TOPICS.indexOf(topic) + 1}. {topic.name}</span>
-              <span className="levelling-topic-count">{topicDone}/{topic.problems.length}</span>
+              <span className="levelling-topic-count" style={{ color: countColor }}>{topicCount}/{topic.problems.length}</span>
               <span aria-hidden="true">{isExpanded ? "▲" : "▼"}</span>
             </button>
             {isExpanded && (
@@ -79,12 +80,12 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
                   const problems = visible.filter((problem) => problem.level === groupLevel);
                   if (problems.length === 0) return null;
                   const allProblems = topic.problems.filter((problem) => problem.level === groupLevel);
-                  const levelDone = allProblems.filter(isDone).length;
+                  const levelCount = allProblems.filter(matchesCountMode).length;
                   return (
                     <section key={groupLevel} className="levelling-level-group" aria-label={`${topic.name} ${groupLevel}`}>
                       <h3 className="levelling-subtopic">
                         <span>{groupLevel} — {topic.levelTitles?.[groupLevel] || LEVEL_TITLES[groupLevel]}</span>
-                        <span>{levelDone}/{allProblems.length}</span>
+                        <span style={{ color: countColor }}>{levelCount}/{allProblems.length}</span>
                       </h3>
                       {problems.map((problem) => {
                         const completed = isDone(problem);
