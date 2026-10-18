@@ -2,6 +2,29 @@ export function countChecks(mask = 0) {
   return (mask & 1) + ((mask >> 1) & 1) + ((mask >> 2) & 1);
 }
 
+export function summarizeProgress(problems, getMask) {
+  const summary = {
+    total: problems.length,
+    counts: [0, 0, 0, 0],
+    stats: Object.fromEntries(["E", "M", "H"].map((diff) => [diff, { total: 0, counts: [0, 0, 0, 0] }])),
+    csesTotal: 0,
+    csesCounts: [0, 0, 0, 0],
+  };
+  for (const problem of problems) {
+    const count = countChecks(getMask(problem));
+    summary.counts[count]++;
+    if (summary.stats[problem.diff]) {
+      summary.stats[problem.diff].total++;
+      summary.stats[problem.diff].counts[count]++;
+    }
+    if (problem.cses) {
+      summary.csesTotal++;
+      summary.csesCounts[count]++;
+    }
+  }
+  return summary;
+}
+
 export function loadProgress(source, storage) {
   try {
     const saved = JSON.parse(storage.getItem(`${source}-progress-v2`) || "null");

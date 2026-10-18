@@ -10,6 +10,7 @@
 - Danh sách HackerRank theo nhóm kỹ năng: warm-up, array/sorting, string, hashmap/search, stack/queue, tree/graph, dynamic programming, greedy.
 - Bộ lọc bài: tất cả, chưa làm, đã làm, và nhóm must-do cho LeetCode/Levelling. Tab Levelling có thêm bộ lọc level, mở tất cả hoặc thu gọn topic.
 - Thanh tiến độ tổng và thống kê theo độ khó Easy, Medium, Hard.
+- Phía trên có 3 chế độ đếm **Xanh dương (đúng 1 tick)**, **Vàng (đúng 2 tick)**, **Xanh lá (đúng 3 tick)**, mặc định xanh lá. Mỗi nút hiển thị số bài theo màu trong tab hiện tại; đổi chế độ cập nhật số trên các tab, thanh tiến độ, thống kê độ khó và CSES. Đếm theo toàn bộ tab, độc lập với bộ lọc danh sách; bài trùng chỉ tính một lần.
 - Mỗi bài có **3 checkbox độc lập** cho 3 lượt ôn: **1/3 xanh dương**, **2/3 vàng**, **3/3 xanh lá**. Chỉ đủ 3 tick mới được tính hoàn thành, gạch tên và đưa vào bộ lọc “Đã làm”; bài 0–2 tick vẫn ở “Chưa làm”.
 - Checklist lưu bằng `localStorage`, nên cả 3 checkbox được giữ lại trên cùng trình duyệt. Quy tắc này áp dụng cho LeetCode, Levelling, Qualcomm, CSES và HackerRank.
 - Link trực tiếp tới từng bài để luyện nhanh.
@@ -117,7 +118,7 @@ Tiến độ 3 checkbox được lưu trong trình duyệt bằng `localStorage`
 - `hr-progress-v2` cho HackerRank
 - `cses-progress-v2` cho các bài CSES trong Levelling
 
-Mỗi key chứa `{ version: 2, checks: { ... } }`; mỗi bài lưu trạng thái độc lập của 3 ô bằng bitmask từ 1 đến 7, bài chưa tick được bỏ khỏi object. Mọi bộ đếm (tổng, độ khó, topic, level, core 20) chỉ tính bài có đủ 3 tick.
+Mỗi key chứa `{ version: 2, checks: { ... } }`; mỗi bài lưu trạng thái độc lập của 3 ô bằng bitmask từ 1 đến 7, bài chưa tick được bỏ khỏi object. Số đếm phía trên theo chế độ màu đang chọn; tiến độ hoàn thành của topic, level, core 20 và bộ lọc “Đã làm” vẫn chỉ tính bài đủ 3 tick.
 
 Lần đầu dùng bản mới, các bài đã tick trong `lc-done`, `hr-done`, `cses-done` được chuyển thành **1/3** (một lượt đã làm). Dữ liệu cũ được giữ nguyên làm bản lưu; sau chuyển đổi ứng dụng dùng các key `*-progress-v2`, kể cả khi bỏ hết tick. Để reset hoàn toàn, xóa cả key mới và key cũ, hoặc xóa site data.
 

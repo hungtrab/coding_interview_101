@@ -3,7 +3,7 @@ import Levelling from "./Levelling";
 import Qualcomm from "./Qualcomm";
 import ProblemChecks from "./ProblemChecks";
 import useProblemProgress from "./useProblemProgress";
-import { countChecks } from "./progress";
+import { countChecks, summarizeProgress } from "./progress";
 import { LEVELLING_PROBLEMS, levellingUrl } from "./data/levelling";
 import { QUALCOMM_PROBLEMS } from "./data/qualcomm";
 
@@ -400,6 +400,11 @@ const HR_TOPICS = [
 
 const DIFF_COLORS = { E: "#3fb950", M: "#d29922", H: "#f85149" };
 const DIFF_LABELS = { E: "Easy", M: "Medium", H: "Hard" };
+const COUNT_MODES = [
+  { level: 1, label: "Xanh dương", color: "#79c0ff" },
+  { level: 2, label: "Vàng", color: "#e3b341" },
+  { level: 3, label: "Xanh lá", color: "#56d364" },
+];
 
 function lcSlug(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "").replace(/^-+/, "");
@@ -413,6 +418,7 @@ export default function DSARoadmap() {
   const [expandedHr, setExpandedHr] = useState("0");
   const [filter, setFilter] = useState("all");
   const [tab, setTab] = useState("leetcode");
+  const [countMode, setCountMode] = useState(3);
 
   const allLc = useMemo(() => {
     const seen = new Set();
@@ -422,47 +428,13 @@ export default function DSARoadmap() {
     });
   }, []);
   const allHr = useMemo(() => HR_TOPICS.flatMap((t, ti) => t.problems.map((p, pi) => ({ ...p, key: `${ti}-${pi}` }))), []);
-  const lcTotal = allLc.length;
-  const lcDone = allLc.filter((p) => done.has(p.lc)).length;
-  const hrTotal = allHr.length;
-  const hrDoneCount = allHr.filter((p) => hrDone.has(p.key)).length;
-  const qualcommTotal = QUALCOMM_PROBLEMS.length;
-  const qualcommDone = QUALCOMM_PROBLEMS.filter((p) => done.has(p.lc)).length;
-  const levellingTotal = LEVELLING_PROBLEMS.length;
-  const levellingDone = LEVELLING_PROBLEMS.filter((p) => p.lc ? done.has(p.lc) : csesDone.has(p.cses)).length;
-  const csesTotal = LEVELLING_PROBLEMS.filter((p) => p.cses).length;
-  const csesDoneCount = LEVELLING_PROBLEMS.filter((p) => p.cses && csesDone.has(p.cses)).length;
   const starProblems = allLc.filter((p) => p.star);
-
-  const stats = useMemo(() => {
-    const s = { E: 0, M: 0, H: 0, Ed: 0, Md: 0, Hd: 0 };
-    allLc.forEach((p) => { s[p.diff]++; if (done.has(p.lc)) s[p.diff + "d"]++; });
-    return s;
-  }, [done, allLc]);
-
-  const hrStats = useMemo(() => {
-    const s = { E: 0, M: 0, H: 0, Ed: 0, Md: 0, Hd: 0 };
-    allHr.forEach((p) => { s[p.diff]++; if (hrDone.has(p.key)) s[p.diff + "d"]++; });
-    return s;
-  }, [hrDone, allHr]);
-
-  const levellingStats = useMemo(() => {
-    const s = { E: 0, M: 0, H: 0, Ed: 0, Md: 0, Hd: 0 };
-    LEVELLING_PROBLEMS.filter((p) => p.lc).forEach((p) => {
-      s[p.diff]++;
-      if (done.has(p.lc)) s[p.diff + "d"]++;
-    });
-    return s;
-  }, [done]);
-
-  const qualcommStats = useMemo(() => {
-    const s = { E: 0, M: 0, H: 0, Ed: 0, Md: 0, Hd: 0 };
-    QUALCOMM_PROBLEMS.forEach((p) => {
-      s[p.diff]++;
-      if (done.has(p.lc)) s[p.diff + "d"]++;
-    });
-    return s;
-  }, [done]);
+  const summaries = {
+    leetcode: summarizeProgress(allLc, (p) => lcChecks[p.lc]),
+    levelling: summarizeProgress(LEVELLING_PROBLEMS, (p) => p.cses ? csesChecks[p.cses] : lcChecks[p.lc]),
+    qualcomm: summarizeProgress(QUALCOMM_PROBLEMS, (p) => lcChecks[p.lc]),
+    hackerrank: summarizeProgress(allHr, (p) => hrChecks[p.key]),
+  };
 
   const shouldShow = (p, isDone) => {
     if (filter === "all") return true;
@@ -472,14 +444,10 @@ export default function DSARoadmap() {
     return true;
   };
 
-  const summaries = {
-    leetcode: { stats, total: lcTotal, completed: lcDone, color: "#58a6ff", gradient: "linear-gradient(90deg,#3fb950,#58a6ff)" },
-    levelling: { stats: levellingStats, total: levellingTotal, completed: levellingDone, color: "#d2a8ff", gradient: "linear-gradient(90deg,#58a6ff,#d2a8ff)" },
-    qualcomm: { stats: qualcommStats, total: qualcommTotal, completed: qualcommDone, color: "#58a6ff", gradient: "linear-gradient(90deg,#58a6ff,#79c0ff)" },
-    hackerrank: { stats: hrStats, total: hrTotal, completed: hrDoneCount, color: "#2ec866", gradient: "linear-gradient(90deg,#1ba94c,#2ec866)" },
-  };
-  const { stats: currentStats, total: currentTotal, completed: currentDone, color: progressColor, gradient: progressGradient } = summaries[tab];
-  const progressPct = (currentDone / currentTotal) * 100;
+  const currentSummary = summaries[tab];
+  const currentMode = COUNT_MODES.find((mode) => mode.level === countMode);
+  const currentCount = currentSummary.counts[countMode];
+  const progressPct = currentSummary.total ? (currentCount / currentSummary.total) * 100 : 0;
 
   return (
     <div style={{
@@ -496,7 +464,7 @@ export default function DSARoadmap() {
 
         {/* Tabs */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 0, margin: "14px 0 14px", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", width: "fit-content", maxWidth: "100%" }}>
-          {[["leetcode", `LeetCode (${lcDone}/${lcTotal})`, "#ffa116"], ["levelling", `Leetcode Levelling (${levellingDone}/${levellingTotal})`, "#d2a8ff"], ["qualcomm", `Qualcomm (${qualcommDone}/${qualcommTotal})`, "#58a6ff"], ["hackerrank", `HackerRank (${hrDoneCount}/${hrTotal})`, "#1ba94c"]].map(([id, label, clr]) => (
+          {[["leetcode", "LeetCode", "#ffa116"], ["levelling", "Leetcode Levelling", "#d2a8ff"], ["qualcomm", "Qualcomm", "#58a6ff"], ["hackerrank", "HackerRank", "#1ba94c"]].map(([id, label, clr]) => (
             <button key={id} onClick={() => { setTab(id); setFilter("all"); }}
               style={{
                 padding: "8px 18px", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
@@ -504,20 +472,33 @@ export default function DSARoadmap() {
                 background: tab === id ? clr + "20" : "var(--bg3)",
                 color: tab === id ? clr : "var(--text2)",
                 borderBottom: tab === id ? `2px solid ${clr}` : "2px solid transparent",
-              }}>{label}</button>
+              }}>{label} ({summaries[id].counts[countMode]}/{summaries[id].total})</button>
           ))}
         </div>
 
+        <div className="count-modes" role="group" aria-label="Chế độ đếm theo màu">
+          {COUNT_MODES.map((mode) => (
+            <button key={mode.level} type="button" aria-pressed={countMode === mode.level}
+              onClick={() => setCountMode(mode.level)} style={{ "--count-color": mode.color }}>
+              <span>{mode.label} ({mode.level}/3)</span>
+              <strong>{currentSummary.counts[mode.level]}</strong>
+            </button>
+          ))}
+        </div>
+        <p className="count-mode-caption">Đếm đúng màu dòng trong tab hiện tại: {currentMode.label.toLowerCase()} = đúng {countMode} tick.</p>
+
         {/* Progress bar */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <div style={{ flex: 1, height: 8, background: "var(--bg3)", borderRadius: 4, overflow: "hidden" }}>
+          <div role="progressbar" aria-label={`Số bài ${currentMode.label.toLowerCase()}`}
+            aria-valuenow={currentCount} aria-valuemin={0} aria-valuemax={currentSummary.total}
+            style={{ flex: 1, height: 8, background: "var(--bg3)", borderRadius: 4, overflow: "hidden" }}>
             <div style={{
               width: `${progressPct}%`, height: "100%", borderRadius: 4, transition: "width 0.3s",
-              background: progressGradient,
+              background: currentMode.color,
             }} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 600, color: progressColor, minWidth: 55, textAlign: "right" }}>
-            {currentDone}/{currentTotal}
+          <span style={{ fontSize: 13, fontWeight: 600, color: currentMode.color, minWidth: 55, textAlign: "right" }}>
+            {currentCount}/{currentSummary.total}
           </span>
         </div>
 
@@ -526,10 +507,10 @@ export default function DSARoadmap() {
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 12 }}>
             {["E", "M", "H"].map((d) => (
               <span key={d} style={{ color: DIFF_COLORS[d] }}>
-                {DIFF_LABELS[d]}: <b>{currentStats[d + "d"]}/{currentStats[d]}</b>
+                {DIFF_LABELS[d]}: <b>{currentSummary.stats[d].counts[countMode]}/{currentSummary.stats[d].total}</b>
               </span>
             ))}
-            {tab === "levelling" && <span style={{ color: "#d2a8ff" }}>CSES: <b>{csesDoneCount}/{csesTotal}</b></span>}
+            {tab === "levelling" && <span style={{ color: "#d2a8ff" }}>CSES: <b>{currentSummary.csesCounts[countMode]}/{currentSummary.csesTotal}</b></span>}
           </div>
           <div style={{ display: "flex", gap: 4 }}>
             {(tab === "leetcode" || tab === "levelling"

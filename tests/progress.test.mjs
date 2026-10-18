@@ -1,8 +1,22 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { countChecks, loadProgress, toggleCheck } from "../src/progress.js";
+import { countChecks, loadProgress, summarizeProgress, toggleCheck } from "../src/progress.js";
 
 const storage = (values) => ({ getItem: (key) => values[key] ?? null });
+
+test("color counts use exact tick totals, include CSES and ignore other tabs' problems", () => {
+  const problems = [{ lc: 1, diff: "E" }, { lc: 2, diff: "M" }, { lc: 3, diff: "H" }, { lc: 4, diff: "M" }, { cses: 1746 }];
+  const checks = { 1: 4, 2: 5, 3: 7, 1746: 2, 999: 7 };
+  const summary = summarizeProgress(problems, (p) => checks[p.lc || p.cses]);
+  assert.equal(summary.total, 5);
+  assert.deepEqual(summary.counts, [1, 2, 1, 1]);
+  assert.deepEqual(summary.stats.E, { total: 1, counts: [0, 1, 0, 0] });
+  assert.deepEqual(summary.stats.M, { total: 2, counts: [1, 0, 1, 0] });
+  assert.deepEqual(summary.stats.H, { total: 1, counts: [0, 0, 0, 1] });
+  assert.equal(summary.csesTotal, 1);
+  assert.deepEqual(summary.csesCounts, [0, 1, 0, 0]);
+  assert.deepEqual(summarizeProgress([], () => 0).counts, [0, 0, 0, 0]);
+});
 
 test("legacy completion becomes one review for each platform", () => {
   for (const [source, id] of [["lc", 1], ["hr", "0-0"], ["cses", 1746]]) {
