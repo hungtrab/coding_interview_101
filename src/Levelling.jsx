@@ -11,7 +11,8 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
   const [expanded, setExpanded] = useState(new Set(["hash-prefix"]));
   const [level, setLevel] = useState("all");
   const isDone = (problem) => problem.lc ? done.has(problem.lc) : csesDone.has(problem.cses);
-  const matchesCountMode = (problem) => countChecks(problem.lc ? lcChecks[problem.lc] : csesChecks[problem.cses]) === countMode;
+  const progress = (problem) => countChecks(problem.lc ? lcChecks[problem.lc] : csesChecks[problem.cses]);
+  const matchesCountMode = (problem) => progress(problem) === countMode;
   const core = LEVELLING_PROBLEMS.filter((problem) => problem.star);
   const coreCount = core.filter(matchesCountMode).length;
   const lcCount = LEVELLING_PROBLEMS.filter((problem) => problem.lc).length;
@@ -19,8 +20,8 @@ export default function Levelling({ done, csesDone, lcChecks, csesChecks, toggle
   const practiceCount = LEVELLING_TOPICS.reduce((total, topic) => total + topic.problems.length, 0);
   const visibleProblems = (topic) => topic.problems.filter((problem) => {
     if (level !== "all" && problem.level !== level) return false;
-    if (filter === "todo") return !isDone(problem);
-    if (filter === "done") return isDone(problem);
+    if (filter === "todo") return progress(problem) < countMode;
+    if (filter === "done") return progress(problem) >= countMode;
     if (filter === "star") return problem.star;
     return true;
   });

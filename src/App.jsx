@@ -436,10 +436,11 @@ export default function DSARoadmap() {
     hackerrank: summarizeProgress(allHr, (p) => hrChecks[p.key]),
   };
 
-  const shouldShow = (p, isDone) => {
+  const shouldShow = (p, mask) => {
+    const progress = countChecks(mask);
     if (filter === "all") return true;
-    if (filter === "todo") return !isDone;
-    if (filter === "done") return isDone;
+    if (filter === "todo") return progress < countMode;
+    if (filter === "done") return progress >= countMode;
     if (filter === "star") return p.star;
     return true;
   };
@@ -514,8 +515,8 @@ export default function DSARoadmap() {
           </div>
           <div style={{ display: "flex", gap: 4 }}>
             {(tab === "leetcode" || tab === "levelling"
-              ? [["all", "Tất cả"], ["todo", "Chưa làm"], ["done", "Đã làm"], ["star", "★ Must-do"]]
-              : [["all", "Tất cả"], ["todo", "Chưa làm"], ["done", "Đã làm"]]
+              ? [["all", "Tất cả"], ["todo", "Chưa đạt màu"], ["done", "Đạt màu"], ["star", "★ Must-do"]]
+              : [["all", "Tất cả"], ["todo", "Chưa đạt màu"], ["done", "Đạt màu"]]
             ).map(([val, label]) => (
               <button key={val} onClick={() => setFilter(val)}
                 style={{
@@ -598,7 +599,7 @@ export default function DSARoadmap() {
                     const tProblems = topic.problems
                       .filter((p) => { if (p.skip || seenT.has(p.lc)) return false; seenT.add(p.lc); return true; });
                     const tCount = tProblems.filter((p) => countChecks(lcChecks[p.lc]) === countMode).length;
-                    const visible = tProblems.filter((p) => shouldShow(p, done.has(p.lc)));
+                    const visible = tProblems.filter((p) => shouldShow(p, lcChecks[p.lc]));
                     if (visible.length === 0 && filter !== "all") return null;
                     return (
                       <div key={ti}>
@@ -657,13 +658,13 @@ export default function DSARoadmap() {
           <Levelling done={done} csesDone={csesDone} lcChecks={lcChecks} csesChecks={csesChecks} toggleLc={toggleLc} toggleCses={toggleCses} filter={filter} countMode={countMode} countColor={currentMode.color} />
         )}
 
-        {tab === "qualcomm" && <Qualcomm done={done} lcChecks={lcChecks} toggleLc={toggleLc} filter={filter} />}
+        {tab === "qualcomm" && <Qualcomm done={done} lcChecks={lcChecks} toggleLc={toggleLc} filter={filter} countMode={countMode} />}
 
         {/* === HACKERRANK TAB === */}
         {tab === "hackerrank" && HR_TOPICS.map((topic, ti) => {
           const isExp = expandedHr === String(ti);
           const tCount = topic.problems.filter((_, pi) => countChecks(hrChecks[`${ti}-${pi}`]) === countMode).length;
-          const visible = topic.problems.filter((p, pi) => shouldShow(p, hrDone.has(`${ti}-${pi}`)));
+          const visible = topic.problems.filter((p, pi) => shouldShow(p, hrChecks[`${ti}-${pi}`]));
 
           return (
             <div key={ti} style={{ marginBottom: 12 }}>

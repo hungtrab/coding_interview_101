@@ -5,10 +5,11 @@ import "./Qualcomm.css";
 
 const DIFFICULTIES = { E: "Easy", M: "Medium", H: "Hard" };
 
-export default function Qualcomm({ done, lcChecks, toggleLc, filter }) {
+export default function Qualcomm({ done, lcChecks, toggleLc, filter, countMode }) {
   const visible = QUALCOMM_PROBLEMS.filter((problem) => {
-    if (filter === "todo") return !done.has(problem.lc);
-    if (filter === "done") return done.has(problem.lc);
+    const progress = countChecks(lcChecks[problem.lc]);
+    if (filter === "todo") return progress < countMode;
+    if (filter === "done") return progress >= countMode;
     return true;
   });
 
