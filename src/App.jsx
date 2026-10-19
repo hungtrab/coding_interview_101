@@ -414,7 +414,7 @@ export default function DSARoadmap() {
   const { checks: lcChecks, done, toggle: toggleLc } = useProblemProgress("lc");
   const { checks: hrChecks, done: hrDone, toggle: toggleHr } = useProblemProgress("hr");
   const { checks: csesChecks, done: csesDone, toggle: toggleCses } = useProblemProgress("cses");
-  const [expandedPhase, setExpandedPhase] = useState("p1");
+  const [expandedPhases, setExpandedPhases] = useState(() => new Set(["p1"]));
   const [expandedHr, setExpandedHr] = useState("0");
   const [filter, setFilter] = useState("all");
   const [tab, setTab] = useState("leetcode");
@@ -521,7 +521,8 @@ export default function DSARoadmap() {
                 style={{
                   padding: "4px 10px", fontSize: 11, fontWeight: 600, border: "1px solid var(--border)",
                   borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
-                  background: filter === val ? "#58a6ff" : "var(--bg3)",
+                  background: filter === val ? currentMode.color : "var(--bg3)",
+                  borderColor: filter === val ? currentMode.color : "var(--border)",
                   color: filter === val ? "#0d1117" : "var(--text2)",
                 }}>{label}</button>
             ))}
@@ -557,7 +558,7 @@ export default function DSARoadmap() {
       <div style={{ padding: "16px 24px 40px" }}>
         {/* === LEETCODE TAB === */}
         {tab === "leetcode" && PHASES.map((phase) => {
-          const isExp = expandedPhase === phase.id;
+          const isExp = expandedPhases.has(phase.id);
           const seen = new Set();
           const pProblems = phase.topics.flatMap((t) => t.problems).filter((p) => {
             if (p.skip || seen.has(p.lc)) return false; seen.add(p.lc); return true;
@@ -567,7 +568,12 @@ export default function DSARoadmap() {
 
           return (
             <div key={phase.id} style={{ marginBottom: 12 }}>
-              <button onClick={() => setExpandedPhase(isExp ? null : phase.id)}
+              <button onClick={() => setExpandedPhases((current) => {
+                const next = new Set(current);
+                if (next.has(phase.id)) next.delete(phase.id);
+                else next.add(phase.id);
+                return next;
+              })}
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 12,
                   padding: "14px 16px", background: "var(--bg2)", border: "1px solid var(--border)",
